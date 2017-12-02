@@ -103,8 +103,14 @@ FreeBSD: {
 }
 ```
 So we're done.  We can build the packages on central poudriere
-server and install them locally on our servers, eg:
+server, fetch them and install them locally on our servers, eg:
 ```
 pkg install vim
 ```
+
+How to install and use central poudriere server is good described
+here:
+[a link]https://www.freebsd.org/doc/handbook/ports-poudriere.html
+[a link]https://github.com/freebsd/poudriere/wiki
+
 
