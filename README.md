@@ -12,7 +12,7 @@ Additionally I'm using some tweaks to boost server
 networking performance.  Let's start with them and kernel modules
 first.
 
-#### FreeBSD sysctl and loader.conf
+#### FreeBSD /etc/sysctl and /boot/loader.conf
 
 I use this `/boot/loader.conf` in most cases:
 
@@ -63,4 +63,48 @@ net.inet.ip.intr_queue_maxlen=2048  # (default 256)
 net.route.netisr_maxqlen=2048       # (default 256)
 ```
 
+Please note, I'm using only FreeBSD releases on production servers and update them only for security patches with
+
+```
+freebsd-update fetch
+freebsd-update install
+
+```
+I always avoid building sources on production servers as well as CURRENT and STABLE, but I think everyone does the same.
+
+#### Poudriere:
+
+I really like using poudriere, and personally I use it on every
+server, I've created environment with one central server which
+builds packages every night and distribute them across another
+servers. So let's configure it first, I'm describing here only
+client part not a server one:
+
+```
+sudo mkdir -p /usr/local/etc/ssl/{keys,certs}
+ssh krion@our_poudriere_server 'cat /usr/local/etc/ssl/certs/poudriere.cert' | sudo tee /usr/local/etc/ssl/certs/poudriere.cert
+sudo mkdir -p /usr/local/etc/pkg/repos
+sudo vi /usr/local/etc/pkg/repos/poudriere.conf
+
+poudriere: {
+    url: "http://our_poudriere_server/packages/11amd64-default/",
+    mirror_type: "https",
+    signature_type: "pubkey",
+    pubkey: "/usr/local/etc/ssl/certs/poudriere.cert",
+    enabled: yes,
+}
+```
+Disable official FreeBSD pkg repo and use only ours:
+```
+sudo vi /usr/local/etc/pkg/repos/freebsd.conf
+
+FreeBSD: {
+    enabled: no
+}
+```
+So we're done.  We can build the packages on central poudriere
+server and install them locally on our servers, eg:
+```
+pkg install vim
+```
 
