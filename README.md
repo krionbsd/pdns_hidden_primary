@@ -110,7 +110,7 @@ pkg install vim
 
 How to install and use central poudriere server is good described
 here:
-[a link]https://www.freebsd.org/doc/handbook/ports-poudriere.html
-[a link]https://github.com/freebsd/poudriere/wiki
+https://www.freebsd.org/doc/handbook/ports-poudriere.html
+https://github.com/freebsd/poudriere/wiki
 
 
