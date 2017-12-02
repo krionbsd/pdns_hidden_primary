@@ -1,4 +1,4 @@
-## How to configure hidden PowerDNS primary on FreeBSD jail and pf rules:
+# How to configure hidden PowerDNS primary on FreeBSD jail with pf rules:
 
 When I start any server installation powered by FreeBSD, I usually
 start with poudriere repo to fetch packages from my central
@@ -12,7 +12,7 @@ Additionally I'm using some tweaks to boost server
 networking performance.  Let's start with them and kernel modules
 first.
 
-#### FreeBSD sysctl and loader.conf
+## FreeBSD sysctl and loader.conf
 
 I use this /boot/loader.conf in most cases:
 
