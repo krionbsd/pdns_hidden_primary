@@ -34,3 +34,5 @@ net.link.ifqmaxlen="2048"
 net.inet.tcp.soreceive_stream="1"
 ```
 
+Here is my /etc/sysctl.conf
+
