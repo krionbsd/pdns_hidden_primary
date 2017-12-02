@@ -36,3 +36,31 @@ net.inet.tcp.soreceive_stream="1"
 
 Here is my /etc/sysctl.conf
 
+```
+vfs.read_max="128"
+net.inet.tcp.sendspace=262144  # (default 32768)
+net.inet.tcp.recvspace=262144  # (default 65536)
+net.inet.tcp.sendbuf_max=16777216
+net.inet.tcp.recvbuf_max=16777216
+net.inet.tcp.sendbuf_inc=32768  # (default 8192)
+net.inet.tcp.recvbuf_inc=65536  # (default 16384)
+net.local.stream.sendspace=16384  # default (8192)
+net.local.stream.recvspace=16384  # default (8192)
+net.inet.raw.maxdgram=16384
+net.inet.raw.recvspace=16384
+net.inet.tcp.abc_l_var=44          # (default 2)
+net.inet.tcp.initcwnd_segments=44  # (default 10)
+net.inet.tcp.mssdflt=1448  # (default 536)
+net.inet.tcp.minmss=524  # (default 216)
+net.inet.tcp.cc.algorithm=htcp
+net.inet.tcp.cc.htcp.adaptive_backoff=1
+net.inet.tcp.cc.htcp.rtt_scaling=1
+net.inet.tcp.rfc6675_pipe=1
+net.inet.tcp.syncookies=0
+net.inet.tcp.nolocaltimewait=1
+net.inet.tcp.tso=0
+net.inet.ip.intr_queue_maxlen=2048  # (default 256)
+net.route.netisr_maxqlen=2048       # (default 256)
+```
+
+
