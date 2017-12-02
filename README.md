@@ -108,9 +108,79 @@ server, fetch them and install them locally on our servers, eg:
 pkg install vim
 ```
 
-How to install and use central poudriere server is good described
-here:
+How to install and use central poudriere server is described here:
+
 * https://www.freebsd.org/doc/handbook/ports-poudriere.html
 * https://github.com/freebsd/poudriere/wiki
 
+#### Installing jail (iocage) and pf rules configuration:
 
+
+
+#### PowerDNS auth installation and configuration:
+
+We've to build PowerDNS auth server first and choose OPTIONS which
+are required for you.  I always enable sqlite3 (for DNSSEC) and
+protobuf support (starting from powerdns-4.1.0 protobuf is enabled
+by default in ports):
+```
+_FILE_COMPLETE_OPTIONS_LIST=GEOIP MYDNS MYSQL OPENDBX OPENLDAP
+OPTALGO PGSQL PROTOBUF REMOTE SQLITE3 TINYDNS TOOLS
+UNIXODBC LUA LUAJIT LUABACKEND ZEROMQ
+OPTIONS_FILE_UNSET+=GEOIP
+OPTIONS_FILE_UNSET+=MYDNS
+OPTIONS_FILE_SET+=MYSQL
+OPTIONS_FILE_UNSET+=OPENDBX
+OPTIONS_FILE_UNSET+=OPENLDAP
+OPTIONS_FILE_SET+=OPTALGO
+OPTIONS_FILE_SET+=PGSQL
+OPTIONS_FILE_UNSET+=PROTOBUF
+OPTIONS_FILE_UNSET+=REMOTE
+OPTIONS_FILE_SET+=SQLITE3
+OPTIONS_FILE_UNSET+=TINYDNS
+OPTIONS_FILE_SET+=TOOLS
+OPTIONS_FILE_UNSET+=UNIXODBC
+OPTIONS_FILE_SET+=LUA
+OPTIONS_FILE_UNSET+=LUAJIT
+OPTIONS_FILE_UNSET+=LUABACKEND
+OPTIONS_FILE_UNSET+=ZEROMQ
+```
+
+Login into your jail `iocage console $jail_name` and install
+PowerDNS auth which you built on poudriere central pkg server with
+`pkg install pdns`.  Your configuration directory is located in 
+`/usr/local/etc/pdns/`
+PowerDNS auth configuration is really easy and straightforward, if
+you have DNS experience, you will be surprised how intuitive and
+simple configuration is.  One of the best PowerDNS features is its
+ability to work with various backends like MySQL, PostgreSQL, SQLite
+etc., but for old farts like me, nothing is better and intuitive
+than old warm Bind zones configurations, so I'll use them in my
+example. 
+
+```
+/usr/local/etc/pdns/pdns.conf:
+
+allow-axfr-ips=$IP_of_your_official_auth_ipv4, $IP_of_your_official_auth_ipv6
+disable-axfr=no
+log-dns-details=on
+
+bind-check-interval=300
+launch=bind
+bind-config=/usr/local/etc/pdns/bindbackend.conf
+local-address=172.16.1.1 # Jail IP
+master=yes
+version-string=anonymous
+
+bind-dnssec-db=/usr/local/etc/pdns/db/bind-dnssec-db.sqlite3
+```
+
+And that's it.  Too easy, isn't it?  Now we need to configure our bind
+zones.
+```
+/usr/local/etc/pdns/bindbackend.conf:
+
+zone "example1.com" { type master; file "/usr/local/etc/pdns/zones/example1.com.zone"; };
+zone "example1_IP.in-addr.arpa" { type master; file "/usr/local/etc/pdns/zones/rev.example1.com"; };
+zone "example2.com" { type master; file "/usr/local/etc/pdns/zones/example2.com.zone"; };
+```
