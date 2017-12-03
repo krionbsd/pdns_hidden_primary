@@ -182,6 +182,50 @@ zones.
 /usr/local/etc/pdns/bindbackend.conf:
 
 zone "example1.com" { type master; file "/usr/local/etc/pdns/zones/example1.com.zone"; };
-zone "example1_IP.in-addr.arpa" { type master; file "/usr/local/etc/pdns/zones/rev.example1.com"; };
+zone "1.168.192.in-addr.arpa" { type master; file "/usr/local/etc/pdns/zones/rev.example1.com"; };
 zone "example2.com" { type master; file "/usr/local/etc/pdns/zones/example2.com.zone"; };
+
+/usr/local/etc/pdns/zones/example1.com.zone:
+
+$ORIGIN example1.com.
+$TTL 180
+;
+; Zone file for example1.com
+;
+
+@       IN      SOA     ns1.example1.com.      postmaster.example1.com. (
+                        2017120101      ; Serial Number (date YYYYMMDD++)
+                        86400           ; Refresh (24 hours)
+                        1800            ; Retry (1/2 hour)
+                        3600000         ; Expire (42 days)
+                        21600)          ; Minimum (6 hours)
+                        IN      NS      your.primary.dns.name.com.
+                        IN      NS      your.primary.dns.name.com.
+
+@                       IN      A      	192.168.1.10
+                        IN      MX      10 mail.example1.com.
+
+mail			IN	A	192.168.1.20
+
+/usr/local/etc/pdns/zones/rev.example1.com:
+
+$ORIGIN 1.168.192.in-addr.arpa.
+$TTL 180
+;
+; Zone file for example1.com
+;
+
+@       IN      SOA     ns1.example1.com.      postmaster.example1.com. (
+                        2017100905      ; Serial Number (date YYYYMMDD++)
+                        86400           ; Refresh (24 hours)
+                        1800            ; Retry (1/2 hour)
+                        3600000         ; Expire (42 days)
+                        21600)          ; Minimum (6 hours)
+                        IN      NS      your.primary.dns.name.com.
+                        IN      NS      your.primary.dns.name.com.
+
+10                      IN      PTR     example1.com.
+20                      IN      PTR     mail.example1.com.
 ```
+
+
