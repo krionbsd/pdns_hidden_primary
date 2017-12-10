@@ -68,8 +68,8 @@ Please note, I'm using only FreeBSD releases on production servers and update th
 ```
 freebsd-update fetch
 freebsd-update install
-
 ```
+
 I always avoid building sources on production servers as well as CURRENT and STABLE, but I think everyone does the same.
 
 #### Poudriere:
