@@ -315,7 +315,7 @@ simple configuration is.  One of the best PowerDNS features is its
 ability to work with various backends like MySQL, PostgreSQL, SQLite
 etc., but for old farts like me, nothing is better and intuitive
 than old warm Bind zones configurations, so I'll use them in my
-example. 
+example.
 
 ```
 /usr/local/etc/pdns/pdns.conf:
@@ -386,4 +386,20 @@ $TTL 180
 20                      IN      PTR     mail.example1.com.
 ```
 
+Check if your DNS auth answers queries with:
+`dig @external_IP_of_your_auth_DNS example1.com SOA +norec +dnssec`
+
+Now let's DNSSEC our zone with:
+```
+pdnsutil secure-zone example1.com
+pdnsutil secure-zone example2.com
+pdnsutil show-zone example1.com
+pdnsutil show-zone example2.com
+```
+
+Now what you need to do, is to go to your registrar (I strongly
+recommend https://www.gandi.net for that) and put DS
+record which is in `pdnsutil` output to your DNSSEC settings and
+wait until it's propagated, you can visualize and check on
+`http://www.dnsviz.net` authentication chain of your domain.
 
