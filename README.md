@@ -115,6 +115,108 @@ How to install and use central poudriere server is described here:
 
 #### Installing jail (iocage) and pf rules configuration:
 
+For creating jail you can use ezjail:
+
+* https://erdgeist.org/arts/software/ezjail/
+
+some prefer iocage:
+
+* https://github.com/iocage/iocage
+
+or you can do it manually:
+
+* https://www.freebsd.org/doc/handbook/jails-build.html
+
+I've wanted to play with iocage a bit and installed it this way:
+`pkg install py36-iocage`
+
+Now you need to enable it in `/etc/rc.conf` at boot time and clone
+lo1 iface on which jail runs:
+
+```
+/etc/rc.conf
+# Setup the interface that all jails will use
+cloned_interfaces="lo1"
+ifconfig_lo1="inet 172.16.1.1 netmask 255.255.255.0"
+iocage_enable="YES"
+```
+
+The next step is to choose what FreeBSD RELEASE we're going to fetch
+and use, if you don't want to specify it explicitly, running `iocage
+fetch` will open a menu to choose which release to download:
+
+```
+# iocage fetch
+[0] 9.3-RELEASE (EOL)
+[1] 10.1-RELEASE (EOL)
+[2] 10.2-RELEASE (EOL)
+[3] 10.3-RELEASE
+[4] 10.4-RELEASE
+[5] 11.0-RELEASE (EOL)
+[6] 11.1-RELEASE
+
+Type the number of the desired RELEASE
+Press [Enter] to fetch the default selection: (11.1-RELEASE)
+```
+
+If you'd like to specify FreeBSD RELEASE from command line, you can
+use:
+
+```
+iocage fetch -r 10.4-RELEASE
+```
+
+Now let's create the jail, give name to it, and apply specific jail
+properties:
+
+```
+iocage create -r 11.1-RELEASE --name dns boot=on
+```
+
+It creates jail with RELEASE 11.1, sets its name to dns and starts
+it at boot time.
+
+Let's give it IP number:
+
+```
+iocage set ip4_addr="lo1|172.16.1.1/24" dns
+```
+
+And check if everything is properly done:
+
+```
+# iocage get ip4_addr dns
+lo1|172.16.1.1/24
+
+# iocage list
+
++-----+------+-------+--------------+------------+
+| JID | NAME | STATE |   RELEASE    |    IP4     |
++=====+======+=======+==============+============+
+| 1   | dns  | up    | 11.1-RELEASE | 172.16.1.1 |
++-----+------+-------+--------------+------------+
+```
+
+Now you can see new and fresh created jail in `zfs list`:
+
+```
+# zfs list | grep iocage
+zroot/iocage                             1.05G  1.72T   100K  /iocage
+zroot/iocage/download                     119M  1.72T    88K  /iocage/download
+zroot/iocage/download/11.1-RELEASE        119M  1.72T   119M  /iocage/download/11.1-RELEASE
+zroot/iocage/images                        88K  1.72T    88K  /iocage/images
+zroot/iocage/jails                        648M  1.72T    88K  /iocage/jails
+zroot/iocage/jails/dns                    648M  1.72T    92K  /iocage/jails/dns
+zroot/iocage/jails/dns/root               648M  1.72T   948M  /iocage/jails/dns/root
+zroot/iocage/log                           92K  1.72T    92K  /iocage/log
+zroot/iocage/releases                     302M  1.72T    88K  /iocage/releases
+zroot/iocage/releases/11.1-RELEASE        302M  1.72T    88K  /iocage/releases/11.1-RELEASE
+zroot/iocage/releases/11.1-RELEASE/root   302M  1.72T   302M  /iocage/releases/11.1-RELEASE/root
+zroot/iocage/templates                     88K  1.72T    88K  /iocage/templates
+```
+
+So, our jail is ready to use, create poudriere as a client in it, to
+install and update packages from within our jail.
 
 
 #### PowerDNS auth installation and configuration:
