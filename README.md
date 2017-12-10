@@ -403,3 +403,8 @@ record which is in `pdnsutil` output to your DNSSEC settings and
 wait until it's propagated, you can visualize and check on
 `http://www.dnsviz.net` authentication chain of your domain.
 
+For all DNSSEC questions you can easily find any related information
+in PowerDNS docs:
+* https://doc.powerdns.com/authoritative/dnssec/index.html
+
+or on IRC #powerdns channel on OFTC (irc.oftc.net)
