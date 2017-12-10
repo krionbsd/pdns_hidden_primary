@@ -331,7 +331,7 @@ local-address=172.16.1.1 # Jail IP
 master=yes
 version-string=anonymous
 
-bind-dnssec-db=/usr/local/etc/pdns/db/bind-dnssec-db.sqlite4
+bind-dnssec-db=/usr/local/etc/pdns/db/bind-dnssec-db.sqlite3
 ```
 
 And that's it.  Too easy, isn't it?  Now we need to configure our bind
