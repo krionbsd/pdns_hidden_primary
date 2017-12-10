@@ -269,7 +269,11 @@ pass out all keep state
 
 I'm not PF guru, so if you think there're errors in this config, let
 me know.  Try to reload firefall rules with `pfctl -f /etc/pf.conf`
-and it should work.
+and now all DNS traffic from outside of your jail can be translated
+and redirected.
+
+If something goes wrong, analyze PF logs with:
+`tcpdump -netttr /var/log/pflog "port 53"`
 
 #### PowerDNS auth installation and configuration:
 
