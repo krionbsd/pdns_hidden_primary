@@ -331,7 +331,7 @@ local-address=172.16.1.1 # Jail IP
 master=yes
 version-string=anonymous
 
-bind-dnssec-db=/usr/local/etc/pdns/db/bind-dnssec-db.sqlite3
+bind-dnssec-db=/usr/local/etc/pdns/db/bind-dnssec-db.sqlite4
 ```
 
 And that's it.  Too easy, isn't it?  Now we need to configure our bind
@@ -388,6 +388,16 @@ $TTL 180
 
 Check if your DNS auth answers queries with:
 `dig @external_IP_of_your_auth_DNS example1.com SOA +norec +dnssec`
+
+You've surely noticed following line in my pdns.conf:
+`bind-dnssec-db=/usr/local/etc/pdns/db/bind-dnssec-db.sqlite3`
+
+You've to create this DB where DNSSEC information is stored first,
+before starting with DNSSEC:
+
+```
+# pdnsutil create-bind-db /usr/local/etc/pdns/db/bind-dnssec-db.sqlite3
+```
 
 Now let's DNSSEC our zone with:
 ```
