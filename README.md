@@ -216,8 +216,60 @@ zroot/iocage/templates                     88K  1.72T    88K  /iocage/templates
 ```
 
 So, our jail is ready to use, create poudriere as a client in it, to
-install and update packages from within our jail.
+install and update packages from within our jail. With `iocage
+console dns` you can login into the jail.
 
+Next step is pf to redirect, nat and allow traffic from and out of
+jail.  First let's enable it in `/etc/rc.conf`:
+
+```
+pf_enable="YES"
+pflog_enable="YES"
+pflog_logfile="/var/log/pflog"
+```
+
+Here let's create our `/etc/pf.conf` and add some rules into it:
+
+```
+/etc/pf.conf
+
+network = "172.16.1.0/24"
+#Define the interfaces
+ext_if = "em0"
+int_if = "lo1"
+jail_net = $int_if:network
+external_addr = "external_ip"
+jail_IP_address = "172.16.1.1"
+
+# Define the NAT for the jails
+nat on $ext_if from $jail_net to any -> ($ext_if)
+
+# Rdr all incoming traffic to port 53 to jail
+rdr on $ext_if proto tcp from any to $external_addr/32 port 53 -> $jail_IP_address port 53
+rdr on $ext_if proto udp from any to $external_addr/32 port 53 -> $jail_IP_address port 53
+
+# Set the default: block everything
+block log all
+
+pass quick on $ext_if proto ipv6
+
+# Allow the jail traffic to be translated
+pass from { lo0, $jail_net } to any keep state
+
+# Allow DNS
+pass in log on $ext_if inet proto tcp to $jail_IP_address port 53
+pass in log on $ext_if inet proto udp to $jail_IP_address port 53
+
+pass in inet6 proto tcp to $ext_if port 53 flags S/SA keep state
+pass in inet6 proto udp to $ext_if port 53
+
+pass quick on $ext_if proto ipv6
+pass out all keep state
+```
+
+I'm not PF guru, so if you think there're errors in this config, let
+me know.  Try to reload firefall rules with `pfctl -f /etc/pf.conf`
+and it should work.
 
 #### PowerDNS auth installation and configuration:
 
